@@ -11,6 +11,8 @@ import csv
 
 from scipy import stats
 
+import statistics
+
 import numpy as np
 
 def importResults(file: str, type: str):
@@ -47,7 +49,18 @@ def importResults(file: str, type: str):
         
     else: 
         assert False, "unhandled option"
-                
+
+def formatNumber(n: float):
+    if n < 0.01:
+        return "{:.2e}".format(n)
+    elif n < 1:
+        return "{:.2g}".format(n)
+    else:
+        return "{:.2f}".format(n)
+
+def printResult(stat: float, p: float):
+    print("\tStatistics={}, p={}".format(formatNumber(stat), formatNumber(p)))
+
 
 # https://machinelearningmastery.com/statistical-hypothesis-tests-in-python-cheat-sheet/
             
@@ -57,27 +70,39 @@ def penaltyTest():
 
     PPO, DQN, A2C = importResults('../Data/Results/Penalty.csv', 'algorithms')
 
+    print("\nA2C:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(A2C)),
+                    formatNumber(statistics.pvariance(A2C))))
+
+    print("DQN:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(DQN)),
+                    formatNumber(statistics.pvariance(DQN))))
+
+    print("PPO:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(PPO)),
+                    formatNumber(statistics.pvariance(PPO))))
+
     #   -------------------------------------------------------------
 
     print("\nShapiro-Wilk Normality test")
 
     print("\tA2C")
     stat, p = stats.shapiro(A2C)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
 
     print("\n\tDQN")
     stat, p = stats.shapiro(DQN)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
 
     print("\n\tPPO")
     stat, p = stats.shapiro(PPO)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
@@ -86,7 +111,7 @@ def penaltyTest():
 
     print("\nBartlett’s test for equal variances")
     stat, p = stats.bartlett(A2C, DQN, PPO)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably equal variances')
     else:         print('\t-> Probably different variances')
@@ -95,7 +120,7 @@ def penaltyTest():
 
     print("\nKruskal-Wallis H-test")
     stat, p = stats.kruskal(A2C, DQN, PPO)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
@@ -106,21 +131,21 @@ def penaltyTest():
     
     print("\tA2C - DQN")
     stat, p = stats.mannwhitneyu(A2C, DQN)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
 
     print("\tDQN - PPO")
     stat, p = stats.mannwhitneyu(DQN, PPO)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
 
     print("\tA2C - PPO")
     stat, p = stats.mannwhitneyu(A2C, PPO)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
@@ -140,20 +165,28 @@ def counterattackTest():
 
     scoring, checkpoint = importResults('../Data/Results/Counterattack.csv', 'policies')
 
+    print("\nscoring:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(scoring)),
+                    formatNumber(statistics.pvariance(scoring))))
+
+    print("checkpoint:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(checkpoint)),
+                    formatNumber(statistics.pvariance(checkpoint))))
+
     #   -------------------------------------------------------------
 
     print("\nShapiro-Wilk Normality test")
 
     print("\tScoring")
     stat, p = stats.shapiro(scoring)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
 
     print("\n\tCheckpoint")
     stat, p = stats.shapiro(checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
@@ -162,7 +195,7 @@ def counterattackTest():
 
     print("\nBartlett’s test for equal variances")
     stat, p = stats.bartlett(scoring, checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably equal variances')
     else:         print('\t-> Probably different variances')
@@ -173,7 +206,7 @@ def counterattackTest():
     
     print("\tScoring - Checkpoint")
     stat, p = stats.mannwhitneyu(scoring, checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
@@ -193,20 +226,28 @@ def iniestaTest():
 
     scoring, checkpoint = importResults('../Data/Results/Iniesta.csv', 'policies')
 
+    print("\nscoring:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(scoring)),
+                    formatNumber(statistics.pvariance(scoring))))
+
+    print("checkpoint:\tMean={}\tVariance={}"
+            .format(formatNumber(statistics.mean(checkpoint)),
+                    formatNumber(statistics.pvariance(checkpoint))))
+
     #   -------------------------------------------------------------
 
     print("\nShapiro-Wilk Normality test")
 
     print("\tScoring")
     stat, p = stats.shapiro(scoring)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
 
     print("\n\tCheckpoint")
     stat, p = stats.shapiro(checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably gaussian')
     else:         print('\t-> Probably not gaussian')
@@ -215,7 +256,7 @@ def iniestaTest():
 
     print("\nBartlett’s test for equal variances")
     stat, p = stats.bartlett(scoring, checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably equal variances')
     else:         print('\t-> Probably different variances')
@@ -226,7 +267,7 @@ def iniestaTest():
     
     print("\tScoring - Checkpoint")
     stat, p = stats.mannwhitneyu(scoring, checkpoint)
-    print("\tStatistics={:.5f}, p={:.5f}".format(stat, p))
+    printResult(stat,p)
     alpha = 0.05
     if p > alpha: print('\t-> Probably the same distribution')
     else:         print('\t-> Probably different distributions')
