@@ -1,3 +1,3 @@
-# TFG RL using Google Research Football
+# TFG - RL algorithm and policy comparison in Google Research Football
 
 to do
