@@ -1,3 +1,1 @@
-# TFG - RL algorithm and policy comparison in Google Research Football
-
-to do
+Repository migrated to [github.com/enriqueboyafalcon/EPSU1445](https://github.com/enriqueboyafalcon/EPSU1445)
